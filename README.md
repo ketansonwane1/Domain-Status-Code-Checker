@@ -1,8 +1,3 @@
-# Domain-Status-Checker
-Sure, here's a more detailed README file:
-
----
-
 # Domain Status Checker
 
 This Python script checks the status codes of HTTP and HTTPS domains listed in a text file and prints the results to the console.
@@ -30,7 +25,7 @@ Before running the script, ensure you have the following installed:
 1. **Clone the Repository**: Begin by cloning the repository to your local machine:
 
     ```bash
-    git clone https://github.com/your_username/your_repository.git
+    git clone https://github.com/ketansonwane1/domain-status-checker.git
     ```
 
 2. **Navigate to the Project Directory**: Use the `cd` command to move into the project directory:
@@ -69,7 +64,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-If you have any questions, issues, or suggestions regarding the script, feel free to contact the project maintainer at [your_email@example.com](mailto:your_email@example.com).
+If you have any questions, issues, or suggestions regarding the script, feel free to contact the project maintainer at ketansonwane421@gmail.com.
 
 ---
 
