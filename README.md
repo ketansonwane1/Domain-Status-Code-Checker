@@ -1,6 +1,20 @@
 # Domain Status Checker
 
 This Python script checks the status codes of HTTP and HTTPS domains listed in a text file and prints the results to the console.
+    
+                                                                         __,__
+                                                                .--.  .-"     "-.  .--.
+                                                              / .. \/  .-. .-.  \/ .. \
+                                                             | |  '|  /   Y   \  |'  | |
+                                                             | \   \  \ 0 | 0 /  /   / |
+                                                              \ '- ,\.-"""""""-./, -' /
+                                                               ''-' /_   ^ ^   _\ '-''
+                                                                   |  \._   _./  |
+                                                                   \   \ '~' /   /
+                                                                    '._ '-=-' _.'
+                                                                       '-----'
+
+
 
 ## Overview
 
