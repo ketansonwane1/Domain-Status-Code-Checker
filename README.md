@@ -1,19 +1,6 @@
-# Domain Status Checker
+![image](https://github.com/ketansonwane1/Domain-Status-Checker/assets/141003493/edacdc8a-77c2-4344-b9ce-3c591b656cbc)# Domain Status Checker
 
 This Python script checks the status codes of HTTP and HTTPS domains listed in a text file and prints the results to the console.
-    
-                                                                         __,__
-                                                                .--.  .-"     "-.  .--.
-                                                              / .. \/  .-. .-.  \/ .. \
-                                                             | |  '|  /   Y   \  |'  | |
-                                                             | \   \  \ 0 | 0 /  /   / |
-                                                              \ '- ,\.-"""""""-./, -' /
-                                                               ''-' /_   ^ ^   _\ '-''
-                                                                   |  \._   _./  |
-                                                                   \   \ '~' /   /
-                                                                    '._ '-=-' _.'
-                                                                       '-----'
-
 
 
 ## Overview
