@@ -25,7 +25,8 @@ Before running the script, ensure you have the following installed:
 1. **Clone the Repository**: Begin by cloning the repository to your local machine:
 
     ```bash
-    git clone https://github.com/ketansonwane1/domain-status-checker.git
+    gi clone https://github.com/ketansonwane1/Domain-Status-Checker/
+
     ```
 
 2. **Navigate to the Project Directory**: Use the `cd` command to move into the project directory:
