@@ -1,70 +1,69 @@
 import argparse
 import requests
-import concurrent.futures
-import nmap
 
-def check_domain(domain, timeout):
-    results = []
+import pyfiglet
+print("***************************************************************************************************************************************************")
+from colorama import Fore, Style
+print(Fore.RED)
+
+def tiger_art():
+    # Large ASCII art of a tiger
+    print("""
+                                                                         __,__
+                                                                .--.  .-"     "-.  .--.
+                                                              / .. \/  .-. .-.  \/ .. \
+                                                             | |  '|  /   Y   \  |'  | |
+                                                             | \   \  \ 0 | 0 /  /   / |
+                                                              \ '- ,\.-"""""""-./, -' /
+                                                               ''-' /_   ^ ^   _\ '-''
+                                                                   |  \._   _./  |
+                                                                   \   \ '~' /   /
+                                                                    '._ '-=-' _.'
+                                                                       '-----'
+    """)
+
+tiger_art()
+print("***************************************************************************************************************************************************")
+parser = argparse.ArgumentParser(description="Check status codes of HTTP and HTTPS domains.")
+parser.add_argument("-f", help="Path to the text file containing domains to check")
+args = parser.parse_args()
+
+# Read the domains from the file
+file = open(args.f, "r")
+domains = file.readlines()
+for domain in domains:
+    domain = domain.strip()
     try:
-        # Check HTTP
-        http_response = requests.head("http://" + domain, allow_redirects=True, timeout=timeout)
+        # Check Status for HTTP
+        http_response = requests.head("http://" + domain, allow_redirects=True, timeout=10)
         http_status_code = http_response.status_code
-        http_headers = http_response.headers
 
         # Check HTTPS
-        https_response = requests.head("https://" + domain, allow_redirects=True, timeout=timeout)
+        https_response = requests.head("https://" + domain, allow_redirects=True, timeout=10)
         https_status_code = https_response.status_code
-        https_headers = https_response.headers
 
-        # Vulnerability Scan using nmap
-        scanner = nmap.PortScanner()
-        scanner.scan(domain)
-        vulnerabilities = scanner.all_hosts()
-
-        # Additional checks can be added here based on headers, response content, etc.
-        results.append({
-            'domain': domain,
-            'http_status_code': http_status_code,
-            'http_headers': http_headers,
-            'https_status_code': https_status_code,
-            'https_headers': https_headers,
-            'vulnerabilities': vulnerabilities
-        })
-    except requests.RequestException as e:
-        results.append({'domain': domain, 'error': str(e)})
-    return results
-
-def main():
-    parser = argparse.ArgumentParser(description="Check status codes of HTTP and HTTPS domains and perform vulnerability scanning.")
-    parser.add_argument("-f", help="Path to the text file containing domains to check", required=True)
-    parser.add_argument("--timeout", type=int, default=10, help="Timeout for HTTP requests (default: 10)")
-    parser.add_argument("--workers", type=int, default=10, help="Number of concurrent workers (default: 10)")
-    args = parser.parse_args()
-
-    # Read the domains from the file
-    with open(args.f, "r") as file:
-        domains = [line.strip() for line in file]
-
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
-        future_to_domain = {executor.submit(check_domain, domain, args.timeout): domain for domain in domains}
-        for future in concurrent.futures.as_completed(future_to_domain):
-            domain = future_to_domain[future]
-            try:
-                results.extend(future.result())
-            except Exception as e:
-                results.append({'domain': domain, 'error': str(e)})
-
-    # Output results
-    for result in results:
-        if 'error' in result:
-            print(f"Domain: {result['domain']} - Error: {result['error']}")
+        # Print status codes
+        if http_status_code == 200:
+            print(f"Domain: http://{domain}-Status Code: 200 (OK)")
+        elif https_status_code in [301, 302]:
+            print(f"Domain: https{domain}-Status Code: {http_status_code} (Redirect)")
+        
+        elif http_status_code == 403:
+            print(f"Domain: http://{domain}-Status Code: 403 (Forbidden)")
         else:
-            print(f"Domain: {result['domain']} - HTTP Status Code: {result['http_status_code']} - HTTPS Status Code: {result['https_status_code']}")
-            print(f"HTTP Headers: {result['http_headers']}")
-            print(f"HTTPS Headers: {result['https_headers']}")
-            print(f"Vulnerabilities: {result['vulnerabilities']}")
+            print(f"Domain: http://{domain}-Status Code: {http_status_code}")
+	    
 
-if __name__ == "__main__":
-    main()
+#        if https_status_code == 200:
+#            print(f"Domain: https://{domain}-Status Code: 200 (OK)")
+#        elif https_status_code in [301, 302]:
+#            print(f"Domain: https://{domain}-Status Code: {https_status_code} (Redirect)")
+#        elif https_status_code == 403:
+#            print(f"Domain: https://{domain}-Status Code: 403 (Forbidden)")
+#        else:
+#            print(f"Domain: https://{domain}-Status Code: {https_status_code}")
 
+    except requests.RequestException as e:
+            print(f"Domain: {domain} - Error: {e}")
+
+file.close()
