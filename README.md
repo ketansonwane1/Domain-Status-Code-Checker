@@ -1,6 +1,7 @@
                                             Domain Status Checker
 
 This Python script checks the status codes of HTTP and HTTPS domains listed in a text file and prints the results to the console.
+![status-code-with-port-2](https://github.com/ketansonwane1/Domain-Status-Code-Checker/assets/141003493/6c8bdf95-f563-4172-90db-b3f9f21c86c4)
 
 ![status-code-with-port](https://github.com/ketansonwane1/Domain-Status-Code-Checker/assets/141003493/e53631ae-f06c-4275-97a5-3014177a6421)
 
