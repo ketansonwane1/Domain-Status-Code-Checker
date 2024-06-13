@@ -1,14 +1,13 @@
 import argparse
+import threading
+import socket
 import requests
+from colorama import Fore
 
-import pyfiglet
-print("***************************************************************************************************************************************************")
-from colorama import Fore, Style
-print(Fore.RED)
-
-def tiger_art():
-    # Large ASCII art of a tiger
-    print("""
+def banner():
+    print("************************************************************************************************************************************************************")
+    print(Fore.CYAN)
+    print('''      
                                                                          __,__
                                                                 .--.  .-"     "-.  .--.
                                                               / .. \/  .-. .-.  \/ .. \
@@ -20,50 +19,85 @@ def tiger_art():
                                                                    \   \ '~' /   /
                                                                     '._ '-=-' _.'
                                                                        '-----'
-    """)
+    
+        |------------------------------------------------------------Coded by Ketan-------------------------------------------------------------------|
+    ''') 
+    print("                                                       Github: https://github.com/ketansonwane1                                                          ")
+    print("************************************************************************************************************************************************************")
 
-tiger_art()
-print("***************************************************************************************************************************************************")
-parser = argparse.ArgumentParser(description="Check status codes of HTTP and HTTPS domains.")
-parser.add_argument("-f", help="Path to the text file containing domains to check")
-args = parser.parse_args()
+def print_status(message, color=Fore.WHITE):
+    print(f"{color}{message}{Fore.RESET}")
 
-# Read the domains from the file
-file = open(args.f, "r")
-domains = file.readlines()
-for domain in domains:
-    domain = domain.strip()
+def dns_resolution(domain):
     try:
-        # Check Status for HTTP
-        http_response = requests.head("http://" + domain, allow_redirects=True, timeout=10)
-        http_status_code = http_response.status_code
+        ip_address = socket.gethostbyname(domain)
+        return ip_address
+    except socket.gaierror:
+        return None
 
-        # Check HTTPS
-        https_response = requests.head("https://" + domain, allow_redirects=True, timeout=10)
-        https_status_code = https_response.status_code
+def check_http_status(domain, timeout):
+    try:
+        http_response = requests.head(f"http://{domain}", allow_redirects=True, timeout=timeout)
+        return http_response.status_code
+    except requests.RequestException:
+        return None
 
-        # Print status codes
-        if http_status_code == 200:
-            print(f"Domain: http://{domain}-Status Code: 200 (OK)")
-        elif https_status_code in [301, 302]:
-            print(f"Domain: https{domain}-Status Code: {http_status_code} (Redirect)")
-        
-        elif http_status_code == 403:
-            print(f"Domain: http://{domain}-Status Code: 403 (Forbidden)")
-        else:
-            print(f"Domain: http://{domain}-Status Code: {http_status_code}")
-	    
+def check_https_status(domain, timeout):
+    try:
+        https_response = requests.head(f"https://{domain}", allow_redirects=True, timeout=timeout)
+        return https_response.status_code
+    except requests.RequestException:
+        return None
 
-#        if https_status_code == 200:
-#            print(f"Domain: https://{domain}-Status Code: 200 (OK)")
-#        elif https_status_code in [301, 302]:
-#            print(f"Domain: https://{domain}-Status Code: {https_status_code} (Redirect)")
-#        elif https_status_code == 403:
-#            print(f"Domain: https://{domain}-Status Code: 403 (Forbidden)")
-#        else:
-#            print(f"Domain: https://{domain}-Status Code: {https_status_code}")
+def check_port(ip_address, port, timeout):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(timeout)
+            result = sock.connect_ex((ip_address, port))
+            return result == 0
+    except socket.error:
+        return False
 
-    except requests.RequestException as e:
-            print(f"Domain: {domain} - Error: {e}")
+def scan_domain(domain, ports, timeout):
+    ip_address = dns_resolution(domain)
+    if ip_address:
+        #print_status(f"Scanning domain: {domain} [{ip_address}]", Fore.GREEN)
+        http_status = check_http_status(domain, timeout)
+        https_status = check_https_status(domain, timeout)
+        #if http_status:
+            #print_status(f"Domain: http://{domain} - Status Code: {http_status}")
+        #if https_status:
+            #print_status(f"Domain: https://{domain} - Status Code: {https_status}")
+        for port in ports:
+            if check_port(ip_address, port, timeout):
+                print_status(f"Port {port} is open on {domain} Status Code is {http_status} ", Fore.GREEN)
+                print_status(f"Port {port} is open on {domain} Status Code is {https_status} ", Fore.GREEN)
+            else:
+                print_status(f"Port {port} is closed on {domain} Status Code is {http_status}", Fore.RED)
+                print_status(f"Port {port} is closed on {domain} Status Code is {https_status}",Fore.RED)
+    else:
+        print_status(f"Domain: {domain} - DNS resolution failed", Fore.YELLOW)
 
-file.close()
+def main():
+    banner()
+    print("Port Scanning is started")
+    parser = argparse.ArgumentParser(description="Check status codes of HTTP and HTTPS domains.")
+    parser.add_argument("-f", help="enter Valid filename")
+    parser.add_argument("-p", nargs="+", type=int, help="ports to scan", default=[80, 443])  
+    parser.add_argument("-t", type=float, help="timeout for port scanning", default=10.0)
+    args = parser.parse_args()
+
+    with open(args.f, "r") as file:
+        domains = [line.strip() for line in file.readlines()]
+
+    threads = []
+    for domain in domains:
+        thread = threading.Thread(target=scan_domain, args=(domain, args.p, args.t))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    print_status("--------------------------------------------------------------------Thank-you------------------------------------------------------------------------------", Fore.GREEN)
+main()
